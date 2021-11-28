@@ -1,0 +1,54 @@
+javac -d bin/ -m hello.world --module-source-path .
+javac -d bin/ -m hello.swing --module-source-path .
+java -p bin/ -d hello.swing
+
+java -p bin/ --add-modules hello.world simonis.HelloWorld
+java -p bin/ --add-modules hello.swing simonis.HelloSwing
+
+java -p bin/ -m hello.world/simonis.HelloWorld
+java -p bin/ -m hello.swing/simonis.HelloSwing
+
+java -p bin/ -d hello.world
+java -p bin/ -d hello.swing
+
+javac -d bin/ -m hello.client --module-source-path client1
+javac -d bin/ -p bin/ -m hello.client --module-source-path client1
+
+javac -d bin/ -p bin/ -m hello.client --module-source-path client2
+java -p bin/ --add-modules hello.client client.Client
+
+javac -d bin/ -m hello.swing --module-source-path .
+javac -d bin/ -p bin/ -m hello.client --module-source-path client1
+java -p bin/ --add-modules hello.client client.Client
+
+jar --create --file bin/hello.swing.jar --main-class simonis.HelloSwing -C bin/hello.swing/ .
+java --module-path bin/hello.swing.jar --module hello.swing
+javap -v --module-path bin/hello.swing.jar --module hello.swing module-info
+javap -v --module-path bin/hello.swing --module hello.swing module-info
+jar -d --file bin/hello.swing.jar
+
+jar --create --file bin/hello.client.jar --main-class client.Client -C bin/hello.client/ .
+java --module-path bin/hello.client.jar --module hello.client
+java --module-path bin/hello.client.jar:bin/hello.swing.jar --module hello.client
+
+
+jar --create --file bin/hello.swing.jar --main-class simonis.HelloSwing --hash-modules hello.client --module-path bin/hello.client.jar -C bin/hello.swing/ .
+jar --create --file bin/hello.client.jar --main-class client.Client -C bin/hello.client/ .
+java --module-path bin/hello.client.jar:bin/hello.swing.jar --module hello.client
+
+jmod describe /share/output-jdk9-dev-opt/images/jdk/jmods/java.base.jmod 
+jmod list /share/output-jdk9-dev-opt/images/jdk/jmods/java.base.jmod | less
+
+
+jlink --output /tmp/client.image --launcher client=hello.client --module-path /share/output-jdk9-dev-opt/images/jdk/jmods:bin/hello.client.jar:bin/hello.swing.jar --add-modules hello.client
+du -sh /tmp/client.image/
+jimage list /tmp/client.image/lib/modules | grep Module:
+/tmp/client.image/bin/client 
+/tmp/client.image/bin/java -m hello.swing
+
+
+jlink --output /tmp/world.image --launcher world=hello.world/simonis.HelloWorld --module-path /share/output-jdk9-dev-opt/images/jdk/jmods:bin/hello.world --add-modules hello.world
+jlink --strip-debug --compress=2 --output /tmp/world.image --launcher world=hello.world/simonis.HelloWorld --module-path /share/output-jdk9-dev-opt/images/jdk/jmods:bin/hello.world --add-modules hello.world
+du -sh /tmp/world.image/
+/tmp/world.image/bin/world
+jimage list /tmp/world.image/lib/modules | grep Module:

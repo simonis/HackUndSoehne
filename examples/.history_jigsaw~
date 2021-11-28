@@ -1,0 +1,54 @@
+/share/output-jdk9-dev-opt/images/jdk/bin/javac -d bin/ -m hello.world --module-source-path .
+/share/output-jdk9-dev-opt/images/jdk/bin/javac -d bin/ -m hello.swing --module-source-path .
+/share/output-jdk9-dev-opt/images/jdk/bin/java -p bin/ -d hello.swing
+
+/share/output-jdk9-dev-opt/images/jdk/bin/java -p bin/ --add-modules hello.world simonis.HelloWorld
+/share/output-jdk9-dev-opt/images/jdk/bin/java -p bin/ --add-modules hello.swing simonis.HelloSwing
+
+/share/output-jdk9-dev-opt/images/jdk/bin/java -p bin/ -m hello.world/simonis.HelloWorld
+/share/output-jdk9-dev-opt/images/jdk/bin/java -p bin/ -m hello.swing/simonis.HelloSwing
+
+/share/output-jdk9-dev-opt/images/jdk/bin/java -p bin/ -d hello.world
+/share/output-jdk9-dev-opt/images/jdk/bin/java -p bin/ -d hello.swing
+
+/share/output-jdk9-dev-opt/images/jdk/bin/javac -d bin/ -m hello.client --module-source-path client1
+/share/output-jdk9-dev-opt/images/jdk/bin/javac -d bin/ -p bin/ -m hello.client --module-source-path client1
+
+/share/output-jdk9-dev-opt/images/jdk/bin/javac -d bin/ -p bin/ -m hello.client --module-source-path client2
+/share/output-jdk9-dev-opt/images/jdk/bin/java -p bin/ --add-modules hello.client client.Client
+
+/share/output-jdk9-dev-opt/images/jdk/bin/javac -d bin/ -m hello.swing --module-source-path .
+/share/output-jdk9-dev-opt/images/jdk/bin/javac -d bin/ -p bin/ -m hello.client --module-source-path client1
+/share/output-jdk9-dev-opt/images/jdk/bin/java -p bin/ --add-modules hello.client client.Client
+
+/share/output-jdk9-dev-opt/images/jdk/bin/jar --create --file bin/hello.swing.jar --main-class simonis.HelloSwing -C bin/hello.swing/ .
+/share/output-jdk9-dev-opt/images/jdk/bin/java --module-path bin/hello.swing.jar --module hello.swing
+/share/output-jdk9-dev-opt/images/jdk/bin/javap -v --module-path bin/hello.swing.jar --module hello.swing module-info
+/share/output-jdk9-dev-opt/images/jdk/bin/javap -v --module-path bin/hello.swing --module hello.swing module-info
+/share/output-jdk9-dev-opt/images/jdk/bin/jar -d --file bin/hello.swing.jar
+
+/share/output-jdk9-dev-opt/images/jdk/bin/jar --create --file bin/hello.client.jar --main-class client.Client -C bin/hello.client/ .
+/share/output-jdk9-dev-opt/images/jdk/bin/java --module-path bin/hello.client.jar --module hello.client
+/share/output-jdk9-dev-opt/images/jdk/bin/java --module-path bin/hello.client.jar:bin/hello.swing.jar --module hello.client
+
+
+/share/output-jdk9-dev-opt/images/jdk/bin/jar --create --file bin/hello.swing.jar --main-class simonis.HelloSwing --hash-modules hello.client --module-path bin/hello.client.jar -C bin/hello.swing/ .
+/share/output-jdk9-dev-opt/images/jdk/bin/jar --create --file bin/hello.client.jar --main-class client.Client -C bin/hello.client/ .
+/share/output-jdk9-dev-opt/images/jdk/bin/java --module-path bin/hello.client.jar:bin/hello.swing.jar --module hello.client
+
+/share/output-jdk9-dev-opt/images/jdk/bin/jmod describe /share/output-jdk9-dev-opt/images/jdk/jmods/java.base.jmod 
+/share/output-jdk9-dev-opt/images/jdk/bin/jmod list /share/output-jdk9-dev-opt/images/jdk/jmods/java.base.jmod | less
+
+
+/share/output-jdk9-dev-opt/images/jdk/bin/jlink --output /tmp/client.image --launcher client=hello.client --module-path /share/output-jdk9-dev-opt/images/jdk/jmods:bin/hello.client.jar:bin/hello.swing.jar --add-modules hello.client
+du -sh /tmp/client.image/
+/share/output-jdk9-dev-opt/images/jdk/bin/jimage list /tmp/client.image/lib/modules | grep Module:
+/tmp/client.image/bin/client 
+/tmp/client.image/bin/java -m hello.swing
+
+
+/share/output-jdk9-dev-opt/images/jdk/bin/jlink --output /tmp/world.image --launcher world=hello.world/simonis.HelloWorld --module-path /share/output-jdk9-dev-opt/images/jdk/jmods:bin/hello.world --add-modules hello.world
+/share/output-jdk9-dev-opt/images/jdk/bin/jlink --strip-debug --compress=2 --output /tmp/world.image --launcher world=hello.world/simonis.HelloWorld --module-path /share/output-jdk9-dev-opt/images/jdk/jmods:bin/hello.world --add-modules hello.world
+du -sh /tmp/world.image/
+/tmp/world.image/bin/world
+/share/output-jdk9-dev-opt/images/jdk/bin/jimage list /tmp/world.image/lib/modules | grep Module:

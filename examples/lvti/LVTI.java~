@@ -1,0 +1,8 @@
+public class LVTI {
+  public void main(String... args) {
+    var msg = new String("Test");
+    var len = args.length;
+    var sa = msg.split(" ");
+    System.out.println(msg + len);
+  }
+}

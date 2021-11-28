@@ -1,0 +1,11 @@
+javac8 Strings.java
+time java9 Strings KIT
+javac9 Strings.java
+time java9 Strings KIT
+javac8 Strings.java
+javap -c Strings
+javac9 Strings.java
+javap -c -v Strings
+java -XX:+TraceBytecodes Strings KIT | less
+javac8 Strings.java
+java -XX:+TraceBytecodes Strings KIT | less

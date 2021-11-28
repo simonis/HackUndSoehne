@@ -1,0 +1,4 @@
+module hello.swing {
+  requires java.desktop;
+  exports simonis;
+}
